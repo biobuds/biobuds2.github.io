@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles de Pago y Contacto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+            height: 100vh;
+            background-color: #000;
+            color: #fff;
+        }
+
+        .gif-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 1s ease-in-out;
+            cursor: pointer;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+        }
+
+        h1, h3, p {
+            color: #fff;
+            text-shadow: 0 0 10px #fff, 0 0 20px #fff;
+            margin-bottom: 20px;
+        }
+
+        .button, .socials a {
+            text-decoration: none;
+            color: #fff;
+            padding: 12px 25px;
+            margin: 10px;
+            display: inline-block;
+            border-radius: 25px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background-color: #333;
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px #fff, 0 0 20px #fff;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .button:hover, .socials a:hover {
+            transform: scale(1.1);
+            background-color: #555;
+        }
+
+        .schedule-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 400px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            z-index: 3;
+            color: #333;
+            font-weight: bold;
+            transition: opacity 0.3s ease;
+        }
+
+        .schedule-modal.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .schedule-modal.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .close-btn {
+            margin-top: 15px;
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background-color: #555;
+        }
+
+        #copyNotification {
+            display: none;
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            z-index: 3;
+            text-shadow: none;
+            box-shadow: 0 0 10px #fff, 0 0 20px #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="gif-container" id="gifContainer"></div>
+    <div class="container">
+        <h1>Detalles de Pago y Contacto</h1>
+        <div class="details">
+            <h3>Datos de Transferencia Bancaria:</h3>
+            <p><strong>Banco:</strong> Scotiabank</p>
+            <p><strong>Cuenta Corriente:</strong> 1276772503</p>
+            <p><strong>RUT:</strong> 12006081-3</p>
+            <p><strong>Correo:</strong> tiendavalpo07@gmail.com</p>
+            <button class="button" onclick="copyToClipboard()">Copiar datos de transferencia</button>
+            <div id="copyNotification">Los datos han sido copiados</div>
+        </div>
+        <div class="socials">
+            <h3>Síguenos y Contáctanos:</h3>
+            <a href="https://www.instagram.com/seedhartavinadelmar/" target="_blank" class="instagram external" rel="noopener">Instagram</a>
+            <a href="https://api.whatsapp.com/send?phone=56993198230&amp;text=Hola,%20quiero%20más%20información%20sobre%20sus%20productos%20y%20obtener%20un%205%%20de%20descuento." target="_blank" class="whatsapp external" rel="noopener">WhatsApp</a>
+            <button class="button" onclick="showSchedule()">Ver Horarios</button>
+        </div>
+    </div>
+    <div id="scheduleModal" class="schedule-modal">
+        <h3>Horarios de Atención:</h3>
+        <p>Lunes a Viernes: 10:30 - 19:00 hrs</p>
+        <p>Sábado: 12:00 - 16:00 hrs</p>
+        <button class="button close-btn" onclick="closeSchedule()">Volver</button>
+    </div>
+    <p>
+    <script>
+        const gifs = [
+            "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHZlaXh2cGQ0YTRuaG85YzJ6cjA3ZWxoN3psaGowYmhtdmVuaWRkcSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/wwnnXHSZKHpjq/giphy.gif",
+            "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHZlaXh2cGQ0YTRuaG85YzJ6cjA3ZWxoN3psaGowYmhtdmVuaWRkcSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/KpAPQVW9lWnWU/giphy.gif",
+            "https://media.giphy.com/media/Jnx5ztK49mHJe/giphy.gif?cid=790b76118veixvpd4a4nho9c2zr07elh7zlhj0bhmveniddq&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+            "https://media.giphy.com/media/4a1BW6oEvxPhK/giphy.gif?cid=790b76118veixvpd4a4nho9c2zr07elh7zlhj0bhmveniddq&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+            "https://media.giphy.com/media/MQg3rNARxgTuH2BvaW/giphy.gif?cid=ecf05e47xb6ut42h3hios1kj7qntxrrkxvhp0761kj3jhku8&ep=v1_gifs_search&rid=giphy.gif&ct=g"
+        ];
+
+        let currentGifIndex = 0;
+
+        function changeGif() {
+            const gifContainer = document.getElementById('gifContainer');
+            gifContainer.style.backgroundImage = `url(${gifs[currentGifIndex]})`;
+            currentGifIndex = (currentGifIndex + 1) % gifs.length;
+            adjustTextColor(gifs[currentGifIndex]);
+        }
+
+        function adjustTextColor(gifUrl) {
+            const contrastColor = getContrastColor(gifUrl);
+            document.body.style.color = contrastColor;
+            document.querySelectorAll('h1, h3, p, .button').forEach(el => el.style.color = contrastColor);
+        }
+
+        function getContrastColor(gifUrl) {
+            // Implementar una lógica real para determinar el color de contraste adecuado
+            return '#fff'; // Cambiar según la lógica implementada
+        }
+
+        setInterval(changeGif, 10000);
+        document.getElementById('gifContainer').addEventListener('click', changeGif);
+        window.onload = changeGif;
+
+        function copyToClipboard() {
+            const data = `Banco: Scotiabank
+Cuenta Corriente: 1276772503
+RUT: 12006081-3
+Correo: tiendavalpo07@gmail.com`;
+
+            try {
+                const textArea = document.createElement('textarea');
+                textArea.value = data;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+
+                const notification = document.getElementById('copyNotification');
+                notification.style.display = 'block';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 2000);
+            } catch (err) {
+                console.error('Error al copiar al portapapeles:', err);
+            }
+        }
+
+        function showSchedule() {
+            const scheduleModal = document.getElementById('scheduleModal');
+            scheduleModal.classList.remove('hide');
+            scheduleModal.classList.add('show');
+        }
+
+        function closeSchedule() {
+            const scheduleModal = document.getElementById('scheduleModal');
+            scheduleModal.classList.remove('show');
+            scheduleModal.classList.add('hide');
+        }
+    </script>
+    </p>
+</body>
+</html>
